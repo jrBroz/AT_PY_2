@@ -1,3 +1,4 @@
+import re
 from bs4 import BeautifulSoup
 from requests.exceptions import RequestException
 import requests
@@ -12,8 +13,17 @@ def limpar_dados(df_perfeito:pd.DataFrame) -> pd.DataFrame:
     
     df_perfeito = df_perfeito.drop_duplicates()  # Remover duplicatas
     df_perfeito = df_perfeito.dropna()  # Remover linhas com valores ausentes
-    
+    df_perfeito = df_perfeito.replace("", "Ausente")
     return df_perfeito
+
+
+def colocar_regex(texto:str) -> str:
+    """Função para aplicar expressões regulares no texto"""
+    
+    texto = re.sub(r'\s+', ' ', texto)  # Substituir múltiplos espaços por um único espaço
+    texto = re.sub(r'\[.*?\]', '', texto)  # Remover referências em colchetes
+    texto = texto.strip()  # Remover espaços em branco 
+    return texto
 
 
 def receber_e_guardar_dados():
@@ -34,15 +44,15 @@ def receber_e_guardar_dados():
             
             # Pegar os dados das colunas do site da wikipedia
             if colunas != []: 
-                Titulo = colunas[0].text.strip()        
-                desenvolvedor = colunas[1].text.strip()
-                publicador = colunas[2].text.strip()
-                exclusivo = colunas[3].text.strip()
-                europa = colunas[4].text.strip()
-                Japao = colunas[5].text.strip()
-                America_do_norte = colunas[6].text.strip()
-                Brasil = colunas[7].text.strip()
-                Referencia = colunas[8].text.strip()
+                Titulo = colocar_regex(colunas[0].text)
+                desenvolvedor = colocar_regex(colunas[1].text)
+                publicador = colocar_regex(colunas[2].text)
+                exclusivo = colocar_regex(colunas[3].text)
+                europa = colocar_regex(colunas[4].text)
+                Japao = colocar_regex(colunas[5].text)
+                America_do_norte = colocar_regex(colunas[6].text)
+                Brasil = colocar_regex(colunas[7].text)
+                Referencia = colocar_regex(colunas[8].text)
 
                 df = df._append({"Titulo": Titulo , "Desenvolvedor": desenvolvedor, "Publicador": publicador, "Exclusivo":exclusivo, "Europa": europa, "Japão": Japao, "América do Norte": America_do_norte, "Brasil": Brasil, "Referências": Referencia}, ignore_index=True)
 
