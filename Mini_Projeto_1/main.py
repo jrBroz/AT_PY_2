@@ -3,15 +3,15 @@ from requests.exceptions import RequestException
 import requests
 import pandas as pd
 
-
-def limpar_dados(df_perfeito:pd.DataFrame):
+class falha_ao_encontrar_wikitable_sortable(Exception):
     
-    df_perfeito.dropna(inplace=True)  # Remover linhas com valor ausente
-    df_perfeito.dropna(axis=1, inplace=True)  # Remover colunas com valor ausente
-    df_perfeito.fillna(value=0, inplace=True)  # Preencher valores ausentes com 0
-    df_perfeito.drop_duplicates(keep=False, inplace=True)  # Remover duplicatas
-    
+    "a classe wikitable sortable não foi encontrada"
 
+def limpar_dados(df_perfeito:pd.DataFrame) -> pd.DataFrame:
+    """Funcao que faz uma limpeza de dados do dataframe passado como parâmetro."""
+    
+    df_perfeito = df_perfeito.drop_duplicates()  # Remover duplicatas
+    df_perfeito = df_perfeito.dropna()  # Remover linhas com valores ausentes
     
     return df_perfeito
 
@@ -22,7 +22,6 @@ def receber_e_guardar_dados():
     try:
         
         requisicao = requests.get(url).text
-        
         soup = BeautifulSoup(requisicao, 'html.parser')
 
         tabela = soup.find('table', class_='wikitable sortable')
@@ -49,25 +48,19 @@ def receber_e_guardar_dados():
 
     
                 df_limpo = limpar_dados(df)
-                    
-                # df_sem_duplicatas = df.drop_duplicates(keep=False)
-                # df_sem_linha_ausente = df_sem_duplicatas.dropna()
-                # # #df = df.dropna() # Remover linhas com valor ausente
-                # # df_sem_coluna_ausente = df_sem_linha_ausente.dropna()
-                # # df = df.dropna(axis=1) # remove coluna com valor ausente
-                # # df = df.fillna(0) #  preenche valor ausente com 0
-                # # df = df.drop_duplicates() # Remover duplicatas 
-
-
-                
-
+                                
         df_limpo.to_csv('Dados_PS4_WIKIPEDIA.csv',sep=',',encoding='utf-8') #gerar dados pra csv
         df_limpo.to_json('Dados_PS4_WIKIPEDIA.json') #gerar dados pra json
         df_limpo.to_excel('Dados_PS4_WIKIPEDIA.xlsx') #gerar dados pra excel
 
-    except (RequestException, requests.ReadTimeout, requests.ConnectionError, requests.ConnectTimeout):
         
-        print("ocorreu um erro no processo de requisição")
+    except (RequestException, requests.ReadTimeout, requests.ConnectionError, requests.ConnectTimeout,falha_ao_encontrar_wikitable_sortable) as e:
+        
+        if e == falha_ao_encontrar_wikitable_sortable:
+            pass
+  
+        else:
+            print("ocorreu um erro no processo de requisição")
         
         
     
