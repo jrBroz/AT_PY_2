@@ -99,8 +99,8 @@ def criar_inserir_BD():
         print("Dados foram inseridos no banco de dados.")
 
         #Exportar todos os dataframes juntos pra um arquivo xlsx só
-        frames = [df_todos_jogos, df_jogo_com_maior_aparicao, df_jogos_relatados_apenas_um_usuario]
-        totalidade = pd.concat([df_todos_jogos, dataframe_para_xlsx_jogos_relatados_apenas_um_usuario, dataframe_para_xlsx_jogo_com_maior_aparicao], axis=1)
+        frames = [df_todos_jogos, dataframe_para_xlsx_jogos_relatados_apenas_um_usuario, df_jogo_com_maior_aparicao]
+        totalidade = pd.concat(frames, axis=1)
         totalidade.to_excel("Dados_Unificados_Final.xlsx") 
 
     except db.exc.SQLAlchemyError:

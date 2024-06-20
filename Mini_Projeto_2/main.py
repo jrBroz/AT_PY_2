@@ -1,6 +1,5 @@
 import pandas as pd
-import csv
-import json
+
 
 class falha_concatenacao(Exception):
     """Erro ao concatenar DataFrames"""
@@ -17,6 +16,8 @@ def limpar_dados(df_perfeito: pd.DataFrame) -> pd.DataFrame:
     df_perfeito = df_perfeito.dropna()  # Remover linhas com valores ausentes
     return df_perfeito
 
+
+
 def ler_transformar_csv() -> pd.DataFrame:
     """Funcao que le e limpa os arquivos presentes no arquivo csv e cria um DataFrame com os arquivos"""
     try:
@@ -27,13 +28,15 @@ def ler_transformar_csv() -> pd.DataFrame:
         # Limpar os dados
         pd_csv_limpo = limpar_dados(pd_csv)
         
-        # Modificar o valor de 'nome_completo' pra alterar o luiz.pereira sem @gmail.com
+        # Modifica o valor de 'nome_completo' pra alterar o luiz.pereira sem @gmail.com, realizando tratamento de dados
         pd_csv_limpo.loc[pd_csv_limpo['email'].str.contains('luiz.pereira', case=False), 'email'] = "luiz.pereira@example.com"
         
         return pd_csv_limpo
 
     except (IsADirectoryError, PermissionError, FileNotFoundError):
         print("Ocorreu um erro ao ler os arquivos...")
+
+
     
 def ler_transformar_excel() -> pd.DataFrame:
     """Funcao que le e limpa os arquivos presentes no arquivo excel"""
@@ -61,6 +64,8 @@ def ler_transformar_json() -> pd.DataFrame:
     except (IsADirectoryError, PermissionError, FileNotFoundError):
         print("Ocorreu um erro ao ler os arquivos...")
 
+
+
 def exportar_para_excel(df_para_excel):
     """Funcao que exporta um DataFrame para o formato de excel e trata com excecao personalizada em caso de erro."""
     try:       
@@ -69,6 +74,8 @@ def exportar_para_excel(df_para_excel):
             df.to_excel(writer, index=False)       
     except exportar_DataFrame_para_excel:
         print("Erro ao tentar converter um dataframe para formato excel")
+
+
 
 def manipulacao_dados() -> None:
     """Funcao que recebe dados advindos das outras funções e concatena tudo em apenas 1 dataframe"""
@@ -80,13 +87,13 @@ def manipulacao_dados() -> None:
         # Identificar e atribuir novos IDs para registros com IDs iguais e nomes diferentes
         ids_contagem = {}
         for df in [pd_csv, pd_excel, pd_json]:
-            ids_duplicados = df[df.duplicated(subset=['id'], keep=False)]  # Registros com IDs duplicados
-            for idx, row in ids_duplicados.iterrows():
-                id_original = row['id']
-                nome = row['nome_completo']
-                if (id_original, nome) not in ids_contagem:
-                    ids_contagem[(id_original, nome)] = len(ids_contagem) + 1
-                novo_id = ids_contagem[(id_original, nome)]
+            ids_duplicados = df[df.duplicated(subset=['id'], keep=False)]  # Aqui ele pega os ids duplicados
+            for idx, row in ids_duplicados.iterrows(): # Itera sobre as linhas com id duplicado
+                id_original = row['id'] # aqui ele pega o id original
+                nome = row['nome_completo'] # pega nome completo
+                if (id_original, nome) not in ids_contagem: # Checa se o nome e ID nao ta no dicionario
+                    ids_contagem[(id_original, nome)] = len(ids_contagem) + 1 # se n tiver ele adiciona o novo ID no dict
+                novo_id = ids_contagem[(id_original, nome)] # o novo_id é resultado da combinação gerada acima.
                 df.loc[idx, 'id'] = f'{id_original}_{novo_id}'  # Atualiza o ID no DataFrame original
         
         # Concatenar DataFrames
