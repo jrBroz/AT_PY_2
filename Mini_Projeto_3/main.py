@@ -42,7 +42,7 @@ def analise_dados():
     for jogos in arquivo_excel['jogos_preferidos']:
         if not isinstance(jogos, str):
             jogos = str(jogos)
-        jogos_lista = jogos.split('|')
+        jogos_lista = jogos.split('|') #a partir do delimitador | jogos é divido em substrings
        
         for jogo in jogos_lista:
             jogo = jogo.strip()

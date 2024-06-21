@@ -11,7 +11,7 @@ class exportar_DataFrame_para_excel(Exception):
 
 def limpar_dados(df_perfeito: pd.DataFrame) -> pd.DataFrame:
     """Funcao que faz uma limpeza de dados do dataframe passado como parâmetro."""
-    df_perfeito = df_perfeito.dropna(subset=['nome_completo'])
+    df_perfeito = df_perfeito.dropna(subset=['nome_completo']) #Remove missing values
     df_perfeito = df_perfeito.drop_duplicates(subset=['nome_completo'])  # Remover duplicatas
     df_perfeito = df_perfeito.dropna()  # Remover linhas com valores ausentes
     return df_perfeito
